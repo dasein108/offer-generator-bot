@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Offer Generator</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css"
+      integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls"
+      crossorigin="anonymous"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <style>
+    * {
+      font-family: Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      padding: 1.5em;
+      background: linear-gradient(90deg, #e3ffe7 0%, #d9e7ff 100%);
+      font-size: 150%;
+    }
+
+    .row {
+      display: flex;
+    }
+
+    .row > label {
+      padding-right: 1em;
+    }
+
+    .pure-form-message {
+      color: red;
+    }
+
+    .pure-g > div {
+      padding-bottom: 10px;
+    }
+
+  </style>
+  <script type="text/javascript">
+    const validationFields = new Set(["offer-name"]);
+    const invalidFields = new Set();
+
+    function showValidation(name, show) {
+      document.querySelector('[name="' + name + '-validation"]').style.display =
+        show ? "block" : "none";
+      show ? invalidFields.add(name) : invalidFields.delete(name);
+    }
+
+    document.addEventListener("input", function (e) {
+      if (!!e.target.value.trim()) {
+        showValidation(e.target.name, false);
+      }
+    });
+
+    function serializeForm() {
+      var form = document.querySelector("form");
+      return Object.values(form).reduce((obj, field) => {
+        if (field.type === "radio") {
+          if (field.checked) obj[field.name] = field.value;
+        } else {
+          obj[field.name] = field.value;
+        }
+        return obj;
+      }, {});
+    }
+
+    function validateData(data) {
+      validationFields.forEach((name) => {
+        const isInvalid = !data[name] || data[name].trim() == "";
+        showValidation(name, isInvalid);
+      });
+
+      return invalidFields.size == 0;
+    }
+
+    // document.addEventListener(
+    //   "click",
+    //   function (event) {
+    //     if (!event.target.matches(".pure-button")) return;
+
+    //     event.preventDefault();
+
+    //     const data = serializeForm();
+    //     validateData(data);
+
+    //     console.log(data, invalidFields);
+    //   },
+    //   false
+    // );
+
+    Telegram.WebApp.ready();
+    Telegram.WebApp.MainButton.setText("Crear 🪄")
+      .show()
+      .onClick(function () {
+        const data = serializeForm();
+        if (validateData(data)) {
+          Telegram.WebApp.sendData(JSON.stringify(data));
+          Telegram.WebApp.close();
+        }
+      });
+  </script>
+  <body>
+    <h3>🎩 Generador de ofertas</h3>
+    <form class="pure-form pure-form-stacked">
+      <div class="pure-g">
+        <div class="pure-u-1">
+          <label>Tipo de promoción</label>
+          <div class="row">
+            <label for="checkbox-radio-option-two" class="pure-radio">
+              <input
+                type="radio"
+                id="checkbox-radio-option-two"
+                name="offer-type"
+                value="slogan"
+              />
+              Eslogan
+            </label>
+            <label for="checkbox-radio-option-three" class="pure-radio">
+              <input
+                type="radio"
+                id="checkbox-radio-option-three"
+                name="offer-type"
+                value="short offer"
+              />
+              Corto
+            </label>
+            <label for="checkbox-radio-option-three" class="pure-radio">
+              <input
+                type="radio"
+                id="checkbox-radio-option-three"
+                name="offer-type"
+                value="long offer"
+                checked=""
+              />
+              Largo
+            </label>
+          </div>
+        </div>
+        <div class="pure-u-1">
+          <label for="multi-first-name">Nombre de la oferta/del producto*.</label>
+          <input
+            type="text"
+            id="multi-first-name"
+            class="pure-input-1"
+            name="offer-name"
+            size="50"
+            placeholder="(ej.: pasteles de chocolate)"
+          />
+          <span class="pure-form-message" name="offer-name-validation"
+            >Campo obligatorio.</span
+          >
+        </div>
+        <div class="pure-u-1">
+          <label for="multi-first-name">Descripción corta*</label>
+          <input
+            name="description"
+            size="100"
+            class="pure-input-1"
+            placeholder="(ej.: pastelería casera de mi madre)"
+          />
+        </div>
+        <div class="pure-u-1">
+          <label for="multi-first-name">Palabras clave</label>
+          <input
+            name="seed-words"
+            size="50"
+            class="pure-input-1"
+            placeholder="(ej.: sabroso, sano, fresco, ecológico)"
+          />
+        </div>
+        <div class="pure-u-1">
+          <label for="multi-first-name">Ubicación</label>
+          <input
+            name="location"
+            size="50"
+            class="pure-input-1"
+            placeholder="(ej.: Manhattan)"
+          />
+        </div>
+        <div class="pure-u-1">
+          <label for="multi-first-name">Efectos esperados:</label>
+          <input
+            name="result"
+            type="text"
+            size="50"
+            class="pure-input-1"
+            placeholder="(ej.: aumento de energía)"
+          />
+        </div>
+      </div>
+    </form>
+    <!-- <button class="pure-button">A Pure Button</button> -->
+  </body>
+  <script type="text/javascript">
+    Telegram.WebApp.expand();
+  </script>
+</html>

@@ -1,0 +1,5 @@
+.idea
+*.log
+__pychache__
+.env
+json_db.json

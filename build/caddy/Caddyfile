@@ -1,0 +1,4 @@
+# host->container for the frontend webapp
+daseincore.tech {
+	reverse_proxy web:8888
+}

@@ -1,0 +1,10 @@
+# defines the SSL cert/key files as a snippet to be reused.
+(ssl_certs) {
+	tls "/data/certs/local.cert.pem" "/data/certs/local.key.pem"
+}
+
+# host->container for the frontend webapp
+dev.local {
+	import ssl_certs
+	reverse_proxy web:8888
+}

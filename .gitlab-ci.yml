@@ -1,0 +1,25 @@
+image: node:18-alpine
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  TARGET_DIR: "ai-bot-services"
+
+stages:
+- deploy_services
+
+before_script:
+  - chmod 400 $SSH_KEY
+  - apk add --no-cache openssh-client ca-certificates rsync
+deploy:
+  stage: deploy_services
+  script:
+    - echo "TELEGRAM_BOT_TOKEN=$AI_TELEGRAM_BOT_TOKEN" >> .env
+    - echo "OPENAI_API_KEY=$OPENAI_API_KEY" >> .env
+    - echo "DEEPL_API_KEY=$DEEPL_API_KEY" >> .env
+    - ssh -o StrictHostKeyChecking=no -i $SSH_KEY root@$MAIN_SERVER "mkdir -p ${TARGET_DIR} "
+    - rsync -avz -e "ssh -o StrictHostKeyChecking=no -i \"$SSH_KEY\"" --progress --exclude=".git" ./ root@$MAIN_SERVER:~/$TARGET_DIR/
+    - ssh -o StrictHostKeyChecking=no -i $SSH_KEY root@$MAIN_SERVER "
+      cd \"$TARGET_DIR\" &&
+      docker-compose build &&
+      docker-compose down &&
+      docker-compose up -d "
